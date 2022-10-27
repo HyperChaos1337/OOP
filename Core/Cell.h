@@ -1,38 +1,18 @@
-#ifndef OOP_LAB1_RM_CELL_H
-#define OOP_LAB1_RM_CELL_H
+#ifndef OOP_LB1_CELL_H
+#define OOP_LB1_CELL_H
 
-#define CELL_SIZE 32
-
-#include "C:\Users\User\CLionProjects\OOP\Events\CellEvent\Earthquake.h"
-#include "C:\Users\User\CLionProjects\OOP\Events\CellEvent\Enemy.h"
-#include "C:\Users\User\CLionProjects\OOP\Events\CellEvent\Exit.h"
-
-#include "C:\Users\User\CLionProjects\OOP\Events\PlayerEvent\Empty.h"
-#include "C:\Users\User\CLionProjects\OOP\Events\PlayerEvent\Getting_gem.h"
-#include "C:\Users\User\CLionProjects\OOP\Events\PlayerEvent\Heal.h"
-#include "C:\Users\User\CLionProjects\OOP\Events\PlayerEvent\Trap.h"
-#include "C:\Users\User\CLionProjects\OOP\Events\PlayerEvent\Wall.h"
-#include "C:\Users\User\CLionProjects\OOP\Events\PlayerEvent\Weapon.h"
+#define size_of_cell 32
+#define player_cell 1
+#define empty_cell 0
+#define wall_cell (-1)
 
 class Cell{
 private:
-    Event* event;
-    bool player_cell = false;
+    int cell_type;
 public:
     Cell();
-    Cell(const Cell& other);
-    Cell& operator=(const Cell& other);
-
-    Cell(Cell&& other);
-    Cell& operator=(Cell&& other);
-
-    bool player_pos();
-    void set_event(Event* cur_event);
-    void set_player_pos(bool place);
-
-    Event* cell_event();
-    Empty* empty_cell();
-
+    Cell(int type_number);
+    void set_type(int type_number);
+    int get_type();
 };
-
 #endif
