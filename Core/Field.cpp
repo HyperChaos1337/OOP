@@ -1,115 +1,109 @@
 #include "Field.h"
 
-
-typedef std::vector<std::vector<Cell>> cell_matrix;
+typedef std::vector<std::vector<Cell>> matrix;
 
 Field::Field(){
-    this->field_size_x = default_x;
-    this->field_size_y = default_y;
-    storage = new EventStorage;
+    this->size_x = default_x;
+    this->size_y = default_y;
 }
 
-Field::Field(int field_size_x, int field_size_y){
-    if(field_size_x < default_x || field_size_y < default_y){
-        std::cout << "Screen resolution must be 1280x1024 or higher. Setting to default..." << std::endl;
-        this->field_size_x = default_x;
-        this->field_size_y = default_y;
+Field::Field(int size_x, int size_y) {
+    if((size_x < default_x) || (size_y < default_y)){
+        std::cout << "Height must be 1024 and width must be 768 or greater. Setting to default..." << std::endl;
+        this->size_x = default_x;
+        this->size_y = default_y;
+    }else{
+        this->size_x = size_x;
+        this->size_y = size_y;
     }
-    else{
-        this->field_size_x = field_size_x;
-        this->field_size_y = field_size_y;
-    }
-    storage = new EventStorage;
+
 }
 Field::Field(const Field &other){
-    this->field_size_x = other.field_size_x;
-    this->field_size_y = other.field_size_y;
-    for (size_t i = 0; i < field_size_y; i++) {
-        field.push_back(other.field[i]);
+    this->size_x = other.size_x;
+    this->size_y = other.size_y;
+    for (size_t i = 0; i < size_y; i++) {
+        game_field.push_back(other.game_field[i]);
     }
 }
 Field& Field::operator=(const Field &other){
     if(this!=&other){
-        field.clear();
-        this->field_size_x = other.field_size_x;
-        this->field_size_y = other.field_size_y;
+        game_field.clear();
+        this->size_x = other.size_x;
+        this->size_y = other.size_y;
 
-        for (size_t i = 0; i < field_size_y; i++) {
-            field.push_back(other.field[i]);
+        for (size_t i = 0; i < size_y; i++) {
+            game_field.push_back(other.game_field[i]);
         }
     }
     return *this;
 }
 
 Field::Field(Field&& other){
-    std::swap(field_size_x, other.field_size_x);
-    std::swap(field_size_y, other.field_size_y);
-    std::swap(field, other.field);
+    std::swap(size_x, other.size_x);
+    std::swap(size_x, other.size_x);
+    std::swap(size_x, other.size_x);
 }
 
 Field& Field::operator=(Field&& other){
     if(this!=&other){
-        std::swap(field_size_x, other.field_size_x);
-        std::swap(field_size_y, other.field_size_y);
-        std::swap(field, other.field);
+        std::swap(size_x, other.size_x);
+        std::swap(size_y, other.size_y);
+        std::swap(game_field, other.game_field);
     }
     return *this;
 }
 
 
 void Field::create_field() {
-    for (size_t i = 0; i < field_size_y; i++) {
-        field.push_back(std::vector<Cell>());
-        for (size_t j = 0; j < field_size_x; j++) {
-            field.back().emplace_back();
+    for (size_t i = 0; i < size_y; i++) {
+        game_field.push_back(std::vector<Cell>());
+        for (size_t j = 0; j < size_x; j++) {
+            game_field.back().emplace_back(empty_cell);
         }
     }
 }
 
 int Field::get_field_size_x() {
-    return field_size_x;
+    return size_x;
 }
 
 int Field::get_field_size_y(){
-    return field_size_y;
+    return size_y;
 }
 
-cell_matrix& Field::get_field_link(){
-    return field;
+matrix& Field::get_field_address(){
+    return game_field;
 }
 
 void Field::clear_field(){
-    for(int i = 0; i < field_size_y; i++){
-        for(int j = 0; j < field_size_x; j++){
-            field[i][j].set_event(storage->get_empty());
+    for(int i = 0; i < size_y; i++){
+        for(int j = 0; j < size_x; j++){
+            game_field[i][j].set_type(empty_cell);
         }
     }
-    field[field_size_y/2][field_size_x/2].set_player_pos(true);
-    for(int i = 0; i < field_size_x * field_size_y / 6; i++) add_wall();
+    game_field[size_y/2][size_x/2].set_type(player_cell);
 
-    add_enemy();
-    add_detonator();
-    add_trap();
-    add_heal();
-
+    for(int i = 0; i < size_x * size_y / 8; i++){
+        add_wall();
+    }
 }
 
 int Field::get_random_empty_cell(){
     int empty_cell_count = 0;
-    for(int i = 0; i < field_size_y; i++){
-        for(int j = 0; j < field_size_x; j++){
-            if(field[i][j].empty_cell() && !field[i][j].player_pos()){
+    for(int i = 0; i < size_y; i++){
+        for(int j = 0; j < size_x; j++){
+            if(game_field[i][j].get_type() == empty_cell){
                 empty_cell_count++;
             }
         }
     }
     int target_empty_cell_index = rand() % empty_cell_count;
     int empty_cell_index = 0;
-    for(int i = 0; i < field_size_y; i++){
-        for(int j = 0; j < field_size_x; j++){
-            if(field[i][j].empty_cell() && !field[i][j].player_pos()){
+    for(int i = 0; i < size_y; i++){
+        for(int j = 0; j < size_x; j++){
+            if(game_field[i][j].get_type() == empty_cell){
                 if(empty_cell_index == target_empty_cell_index){
-                    return i * field_size_x + j;
+                    return i * size_x + j;
                 }
                 empty_cell_index++;
             }
@@ -118,39 +112,10 @@ int Field::get_random_empty_cell(){
     return -1;
 }
 
-void Field::add_detonator(){
-    int detonator_position = get_random_empty_cell();
-    if(detonator_position != -1)
-        field[detonator_position / field_size_x][detonator_position % field_size_x].set_event(storage->get_earthquake());
-}
-void Field::add_exit(){
-    int exit_position = get_random_empty_cell();
-    if(exit_position != -1)
-        field[exit_position / field_size_x][exit_position % field_size_y].set_event(storage->get_exit());
-}
-void Field::add_enemy(){
-    int enemy_position = get_random_empty_cell();
-    if(enemy_position != -1)
-        field[enemy_position / field_size_x][enemy_position % field_size_x].set_event(storage->get_enemy());
-}
-
-void Field::add_gem(){
-    int gem_position = get_random_empty_cell();
-    if(gem_position != -1)
-        field[gem_position / field_size_x][gem_position % field_size_x].set_event(storage->get_getting_gem());
-}
-void Field::add_heal(){
-    int heal_position = get_random_empty_cell();
-    if(heal_position != -1)
-        field[heal_position / field_size_x][heal_position % field_size_x].set_event(storage->get_heal());
-}
-void Field::add_trap(){
-    int trap_position = get_random_empty_cell();
-    if(trap_position != -1)
-        field[trap_position / field_size_x][trap_position % field_size_x].set_event(storage->get_trap());
-}
 void Field::add_wall(){
     int wall_position = get_random_empty_cell();
-    if(wall_position != -1)
-        field[wall_position / field_size_x][wall_position % field_size_x].set_event(storage->get_wall());
+    if(wall_position != -1){
+        game_field[wall_position / size_x][wall_position % size_x].set_type(wall_cell);
+    }
+
 }
