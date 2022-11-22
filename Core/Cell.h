@@ -1,24 +1,27 @@
-#ifndef OOP_LAB1_RM_CELL_H
-#define OOP_LAB1_RM_CELL_H
+#ifndef OOP_LB2_CELL_H
+#define OOP_LB2_CELL_H
 
-#define CELL_SIZE 32
+#include "../Event/CellEvent/Empty.h"
+#include "../Event/CellEvent/Wall.h"
+#include "../Event/PlayerEvent/Heal.h"
+#include "../Event/PlayerEvent/Gem.h"
+#include "../Event/CellEvent/Exit.h"
+#include "../Event/PlayerEvent/Trap.h"
+#include "../Event/PlayerEvent/Weapon.h"
+#include "../Event/PlayerEvent/Enemy.h"
+#include "../Event/PlayerEvent/WeaponUpgrader.h"
 
-#include "C:\Users\User\CLionProjects\OOP\Events\CellEvent\Earthquake.h"
-#include "C:\Users\User\CLionProjects\OOP\Events\CellEvent\Enemy.h"
-#include "C:\Users\User\CLionProjects\OOP\Events\CellEvent\Exit.h"
-
-#include "C:\Users\User\CLionProjects\OOP\Events\PlayerEvent\Empty.h"
-#include "C:\Users\User\CLionProjects\OOP\Events\PlayerEvent\Getting_gem.h"
-#include "C:\Users\User\CLionProjects\OOP\Events\PlayerEvent\Heal.h"
-#include "C:\Users\User\CLionProjects\OOP\Events\PlayerEvent\Trap.h"
-#include "C:\Users\User\CLionProjects\OOP\Events\PlayerEvent\Wall.h"
-#include "C:\Users\User\CLionProjects\OOP\Events\PlayerEvent\Weapon.h"
+#define size_of_cell 32
 
 class Cell{
 private:
+
+    bool is_player_cell = false;
+    bool is_passable = true;
     Event* event;
-    bool player_cell = false;
+
 public:
+
     Cell();
     Cell(const Cell& other);
     Cell& operator=(const Cell& other);
@@ -26,13 +29,14 @@ public:
     Cell(Cell&& other);
     Cell& operator=(Cell&& other);
 
-    bool player_pos();
+    bool get_pl_pos();
+    void set_pl_pos(bool place);
+
     void set_event(Event* cur_event);
-    void set_player_pos(bool place);
+    Event* get_event();
+    Empty* cell_empty();
 
-    Event* cell_event();
-    Empty* empty_cell();
-
+    void set_pass(bool pass);
+    bool is_pass();
 };
-
 #endif
